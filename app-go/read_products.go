@@ -6,15 +6,12 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"os"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-)
-
-const (
-	uri = "mongodb://appuser:appuserpassword@127.0.0.1:27034/appdb?replicaSet=rs0"
 )
 
 type Product struct {
@@ -52,7 +49,26 @@ func printProducts(client *mongo.Client) {
 	fmt.Println("---")
 }
 
+func getURI(user string, password string, host string, port string) string {
+	return fmt.Sprintf("mongodb://%s:%s@%s:%s/appdb?replicaSet=rs0", user, password, host, port)
+}
+
+func getEnv(key string, defaultValue string) string {
+    value := os.Getenv(key)
+    if len(value) == 0 {
+        return defaultValue
+    }
+    return value
+}
+
 func main() {
+	mongo_user := getEnv("MONGO_USER", "appuser")
+	mongo_password := getEnv("MONGO_PASSWORD", "appuserpassword")
+	mongo_host := getEnv("MONGO_HOST", "127.0.0.1")
+	mongo_port := getEnv("MONGO_PORT", "27017")
+
+	uri := getURI(mongo_user, mongo_password, mongo_host, mongo_port)
+	fmt.Println(uri)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))

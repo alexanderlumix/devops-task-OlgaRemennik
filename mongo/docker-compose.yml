@@ -19,7 +19,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongo-0
       MONGO_INITDB_ROOT_PASSWORD: mongo-0
-      MONGO_PORT: 27030
     healthcheck:
       test: echo "try { rs.status() } catch (err)" | mongosh -u mongo-0 -p mongo-0
       interval: 5s
@@ -40,7 +39,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongo-1
       MONGO_INITDB_ROOT_PASSWORD: mongo-1
-      MONGO_PORT: 27031
     healthcheck:
       test: echo "try { rs.status() } catch (err)" | mongosh -u mongo-1 -p mongo-1
       interval: 5s
@@ -61,7 +59,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongo-2
       MONGO_INITDB_ROOT_PASSWORD: mongo-2
-      MONGO_PORT: 27032
     healthcheck:
       test: echo "try { rs.status() } catch (err)" | mongosh -u mongo-2 -p mongo-2
       interval: 5s
@@ -84,9 +81,9 @@ services:
       # - "pip install -r requirements.txt && tail -f /dev/null"
     working_dir: /scripts
     environment:
-      - MONGO_SERVERS_CONFIG_FILE=mongo_servers_docker.yml
-      - MONGO_HOST=mongo-1
-      - MONGO_PORT=27017
+      MONGO_SERVERS_CONFIG_FILE: mongo_servers_docker.yml
+      MONGO_HOST: mongo-1
+      MONGO_PORT: 27017
     volumes:
       - ../scripts:/scripts
     depends_on:
@@ -105,12 +102,21 @@ services:
       # - "pip install -r requirements.txt && tail -f /dev/null"
     working_dir: /app-node
     environment:
-      - MONGO_HOST=mongo-0
-      - MONGO_PORT=27017
+      MONGO_HOST: mongo-0
+      MONGO_PORT: 27017
     volumes:
       - ../app-node:/app-node
     depends_on:
       - init_mongo
+
+  product-reader-go:
+    build:
+      context: ../app-go
+      dockerfile: Dockerfile
+    container_name: product-reader-go
+    environment:
+      - MONGO_HOST=mongo-0
+
 
 volumes:
   mongo-0: {}
