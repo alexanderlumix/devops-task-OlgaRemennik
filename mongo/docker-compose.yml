@@ -73,6 +73,27 @@ services:
       - mongo-2:/data/db
       - ./mongo-keyfile:/etc/mongo-keyfile
 
+  init_mongo:
+    image: python:3.12
+    container_name: init_mongo
+    command:
+      - /bin/bash
+      - -xe
+      - -c
+      - "pip install -r requirements.txt && python3 init_mongo_servers.py ; python3 check_replicaset_status.py && python3 create_app_user.py"
+      # - "pip install -r requirements.txt && tail -f /dev/null"
+    working_dir: /scripts
+    environment:
+      - MONGO_SERVERS_CONFIG_FILE=mongo_servers_docker.yml
+      - MONGO_HOST=mongo-1
+      - MONGO_PORT=27017
+    volumes:
+      - ../scripts:/scripts
+    depends_on:
+      - mongo-0
+      - mongo-1
+      - mongo-2
+
 volumes:
   mongo-0: {}
   mongo-1: {}

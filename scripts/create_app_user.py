@@ -1,9 +1,10 @@
 import pymongo
+import os
 
-MONGO_HOST = '127.0.0.1'
-MONGO_PORT = 27031
-ADMIN_USER = 'mongo-1'
-ADMIN_PASS = 'mongo-1'
+MONGO_HOST = os.getenv('MONGO_HOST', '127.0.0.1')
+MONGO_PORT = os.getenv('MONGO_PORT', 27031)
+ADMIN_USER = 'mongo-0' # FIXME take from env
+ADMIN_PASS = 'mongo-0' # FIXME take from env
 
 APP_DB = 'appdb'
 APP_USER = 'appuser'

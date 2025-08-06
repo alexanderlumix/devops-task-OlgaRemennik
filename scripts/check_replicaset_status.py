@@ -3,6 +3,12 @@
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 import sys
+import os
+
+MONGO_HOST = os.getenv('MONGO_HOST', '127.0.0.1')
+MONGO_PORT = os.getenv('MONGO_PORT', 27031)
+ADMIN_USER = 'mongo-0'
+ADMIN_PASS = 'mongo-0'
 
 def get_state_name(state):
     states = {
@@ -22,7 +28,7 @@ def get_state_name(state):
 def check_replicaset_status():
     try:
         # Connect to MongoDB using the primary node port with authentication
-        connection_string = 'mongodb://mongo-0:mongo-0@127.0.0.1:27034/?replicaSet=rs0&authSource=admin'
+        connection_string = f'mongodb://{ADMIN_USER}:{ADMIN_PASS}@{MONGO_HOST}:{MONGO_PORT}/?replicaSet=rs0&authSource=admin'
         client = MongoClient(connection_string)
         
         # Get replica set status

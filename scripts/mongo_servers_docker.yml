@@ -1,0 +1,13 @@
+servers:
+  - host: "mongo-0"
+    port: 27017
+    user: "mongo-0"
+    password: "mongo-0"
+  - host: "mongo-1"
+    port: 27017
+    user: "mongo-1"
+    password: "mongo-1"
+  - host: "mongo-2"
+    port: 27017
+    user: "mongo-2"
+    password: "mongo-2"

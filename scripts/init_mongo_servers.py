@@ -2,8 +2,9 @@
 import pymongo
 import yaml
 import sys
+import os
 
-CONFIG_FILE = 'mongo_servers.yml'
+CONFIG_FILE = os.getenv('MONGO_SERVERS_CONFIG_FILE', 'mongo_servers.yml')
 
 def load_config(config_file):
     with open(config_file, 'r') as f:
@@ -52,6 +53,7 @@ def init_primary(server):
         client.close()
 
 def main():
+    print(f"using config file {CONFIG_FILE}")
     config = load_config(CONFIG_FILE)
     for idx, server in enumerate(config['servers']):
         test_connection(server)
