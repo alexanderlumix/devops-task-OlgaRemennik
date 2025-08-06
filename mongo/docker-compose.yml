@@ -115,10 +115,9 @@ services:
       dockerfile: Dockerfile
     container_name: product-reader-go
     environment:
-      # MONGO_HOST: haproxy-lb
-      # MONGO_PORT: 27034
-      MONGO_HOST: mongo-1
-      MONGO_PORT: 27017
+      MONGO_HOST: haproxy-lb
+      # MONGO_HOST: mongo-1
+      # MONGO_PORT: 27017
 
 
 volumes:
