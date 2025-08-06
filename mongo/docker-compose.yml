@@ -94,6 +94,24 @@ services:
       - mongo-1
       - mongo-2
 
+  app-node:
+    image: node:24
+    container_name: app-node
+    command:
+      - /bin/bash
+      - -xe
+      - -c
+      - "npm install && node create_product.js"
+      # - "pip install -r requirements.txt && tail -f /dev/null"
+    working_dir: /app-node
+    environment:
+      - MONGO_HOST=mongo-0
+      - MONGO_PORT=27017
+    volumes:
+      - ../app-node:/app-node
+    depends_on:
+      - init_mongo
+
 volumes:
   mongo-0: {}
   mongo-1: {}
