@@ -26,6 +26,7 @@ services:
       timeout: 15s
       start_period: 15s
       retries: 10
+    command: ["--replSet", "rs0", "--keyFile", "/etc/mongo-keyfile"]
     volumes:
       - mongo-0:/data/db
       - ./mongo-keyfile:/etc/mongo-keyfile
@@ -46,6 +47,7 @@ services:
       timeout: 15s
       start_period: 15s
       retries: 10
+    command: ["--replSet", "rs0", "--keyFile", "/etc/mongo-keyfile"]
     volumes:
       - mongo-1:/data/db
       - ./mongo-keyfile:/etc/mongo-keyfile
@@ -66,6 +68,7 @@ services:
       timeout: 15s
       start_period: 15s
       retries: 10
+    command: ["--replSet", "rs0", "--keyFile", "/etc/mongo-keyfile"]
     volumes:
       - mongo-2:/data/db
       - ./mongo-keyfile:/etc/mongo-keyfile
