@@ -1,5 +1,10 @@
 const { MongoClient } = require('mongodb');
-const uri = 'mongodb://appuser:appuserpassword@127.0.0.1:27032/appdb?directConnection=true';
+const MONGO_USER = process.env.MONGO_USER || 'appuser';
+const MONGO_PASSWORD = process.env.MONGO_PASSWORD || 'appuserpassword';
+const MONGO_HOST = process.env.MONGO_HOST || '127.0.0.1';
+const MONGO_PORT = process.env.MONGO_PORT || '27017';
+
+const uri = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/appdb?directConnection=true`;
 
 async function run() {
   const client = new MongoClient(uri, { useUnifiedTopology: true });

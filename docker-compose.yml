@@ -1,0 +1,135 @@
+version: '3.8'
+
+services:
+  haproxy:
+    image: haproxy:2.9
+    container_name: haproxy-lb
+    restart: unless-stopped
+    ports: 
+      - 27017:27017
+    volumes:
+      - ./mongo/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+
+  mongo-0:
+    image: mongo:7.0.16
+    container_name: mongo-0
+    restart: unless-stopped
+    stop_grace_period: 30s
+    ports: 
+      - 27030:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${ROOT_PASS}
+    healthcheck:
+      test: echo "try { rs.status() } catch (err)" | mongosh -u ${ROOT_USER} -p ${ROOT_PASS}
+      interval: 5s
+      timeout: 15s
+      start_period: 15s
+      retries: 10
+    command: ["--replSet", "rs0", "--keyFile", "/etc/mongo-keyfile"]
+    volumes:
+      - mongo-0:/data/db
+      - ./mongo/mongo-keyfile:/etc/mongo-keyfile
+
+  mongo-1:
+    image: mongo:7.0.16
+    container_name: mongo-1
+    restart: unless-stopped
+    stop_grace_period: 30s
+    ports: 
+      - 27031:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${ROOT_PASS}
+    healthcheck:
+      test: echo "try { rs.status() } catch (err)" | mongosh -u ${ROOT_USER} -p ${ROOT_PASS}
+      interval: 5s
+      timeout: 15s
+      start_period: 15s
+      retries: 10
+    command: ["--replSet", "rs0", "--keyFile", "/etc/mongo-keyfile"]
+    volumes:
+      - mongo-1:/data/db
+      - ./mongo/mongo-keyfile:/etc/mongo-keyfile
+
+  mongo-2:
+    image: mongo:7.0.16
+    container_name: mongo-2
+    restart: unless-stopped
+    stop_grace_period: 30s
+    ports: 
+      - 27032:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${ROOT_PASS}
+    healthcheck:
+      test: echo "try { rs.status() } catch (err)" | mongosh -u ${ROOT_USER} -p ${ROOT_PASS}
+      interval: 5s
+      timeout: 15s
+      start_period: 15s
+      retries: 10
+    command: ["--replSet", "rs0", "--keyFile", "/etc/mongo-keyfile"]
+    volumes:
+      - mongo-2:/data/db
+      - ./mongo/mongo-keyfile:/etc/mongo-keyfile
+
+  init_mongo:
+    image: python:3.12
+    container_name: init_mongo
+    restart: "no"
+    command:
+      - /bin/bash
+      - -xe
+      - -c
+      - "pip install -r requirements.txt && python3 init_mongo_servers.py ; python3 check_replicaset_status.py && python3 create_app_user.py"
+      # - "pip install -r requirements.txt && tail -f /dev/null"
+    working_dir: /scripts
+    environment:
+      MONGO_SERVERS_CONFIG_FILE: mongo_servers_docker.yml
+      MONGO_HOST: mongo-0
+      MONGO_PORT: 27017
+      ROOT_USER: ${ROOT_USER}
+      ROOT_PASS: ${ROOT_PASS}
+    volumes:
+      - ./scripts:/scripts
+    depends_on:
+      mongo-0: { condition: service_healthy }
+      mongo-1: { condition: service_healthy }
+      mongo-2: { condition: service_healthy }
+
+  app-node:
+    image: node:24
+    container_name: app-node
+    command:
+      - /bin/bash
+      - -xe
+      - -c
+      - "npm install && node create_product.js"
+      # - "pip install -r requirements.txt && tail -f /dev/null"
+    working_dir: /app-node
+    environment:
+      MONGO_HOST: haproxy-lb
+      MONGO_PORT: 27017
+    volumes:
+      - ./app-node:/app-node
+    depends_on:
+      init_mongo: { condition: service_completed_successfully }
+    restart: "no"
+
+  product-reader-go:
+    build:
+      context: ./app-go
+      dockerfile: Dockerfile
+    container_name: product-reader-go
+    environment:
+      MONGO_HOST: haproxy-lb
+    depends_on:
+      init_mongo: { condition: service_completed_successfully }
+      app-node: { condition: service_completed_successfully }
+    restart: "no"
+
+
+volumes:
+  mongo-0: {}
+  mongo-1: {}
+  mongo-2: {}

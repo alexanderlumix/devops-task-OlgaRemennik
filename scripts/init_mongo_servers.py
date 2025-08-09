@@ -2,8 +2,9 @@
 import pymongo
 import yaml
 import sys
+import os
 
-CONFIG_FILE = 'mongo_servers.yml'
+CONFIG_FILE = os.getenv('MONGO_SERVERS_CONFIG_FILE', 'mongo_servers.yml')
 
 def load_config(config_file):
     with open(config_file, 'r') as f:
@@ -35,9 +36,9 @@ def init_primary(server):
         rs_config = {
             '_id': 'rs0',
             'members': [
-                {'_id': 0, 'host': '127.0.0.1:27030'},
-                {'_id': 1, 'host': '127.0.0.1:27031'},
-                {'_id': 2, 'host': '127.0.0.1:27032'},
+                {'_id': 0, 'host': 'mongo-0:27017'},
+                {'_id': 1, 'host': 'mongo-1:27017'},
+                {'_id': 2, 'host': 'mongo-2:27017'},
             ]
         }
         try:
@@ -52,6 +53,7 @@ def init_primary(server):
         client.close()
 
 def main():
+    print(f"using config file {CONFIG_FILE}")
     config = load_config(CONFIG_FILE)
     for idx, server in enumerate(config['servers']):
         test_connection(server)
