@@ -3,8 +3,8 @@ import os
 
 MONGO_HOST = os.getenv('MONGO_HOST', '127.0.0.1')
 MONGO_PORT = os.getenv('MONGO_PORT', 27031)
-ADMIN_USER = 'mongo-0' # FIXME take from env
-ADMIN_PASS = 'mongo-0' # FIXME take from env
+ADMIN_USER = os.getenv('ROOT_USER', 'mongo')
+ADMIN_PASS = os.getenv('ROOT_PASS', 'mongopass')
 
 APP_DB = 'appdb'
 APP_USER = 'appuser'

@@ -1,15 +1,30 @@
-# DevOps Engineer Task
+# DevOps Task
 
-For each step you will need to troubleshoot and resolve the issues encountered:
+Spin up a 3-node MongoDB replica set behind HAProxy, initialize it with Python, insert two products with Node.js, and read them back with a Go app.
 
-1. Launch MongoDB servers using Docker Compose.
+## Prerequisites
 
-2. Utilize Python scripts to:
+- Docker + Docker Compose v2 (`docker compose …`)
+- `make` (optional but convenient)
 
-- Initialize the MongoDB replica set
-- Verify the replica set status
-- Create an application user
+## Configuration
 
-3. Execute the Node.js application to create two product entries.
+Create `.env` (or copy the example):
 
-4. Run the Go application container to retrieve and display all product entries.
+cp .env.example .env
+
+
+--------
+## Quickstart
+
+# build and start all services
+make up
+
+# watch the init job (replica set init → status → create app user)
+docker compose logs -f init_mongo
+
+# insert two products (Node; runs once)
+make node
+
+# read all products (Go; runs once)
+make go

@@ -7,8 +7,8 @@ import os
 
 MONGO_HOST = os.getenv('MONGO_HOST', '127.0.0.1')
 MONGO_PORT = os.getenv('MONGO_PORT', 27031)
-ADMIN_USER = 'mongo-0'
-ADMIN_PASS = 'mongo-0'
+ADMIN_USER = os.getenv('ROOT_USER')
+ADMIN_PASS = os.getenv('ROOT_PASS')
 
 def get_state_name(state):
     states = {
